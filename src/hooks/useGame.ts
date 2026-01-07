@@ -139,8 +139,7 @@ export function useGame(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
     // Calculate delta time
     const deltaTime = lastTimeRef.current ? timestamp - lastTimeRef.current : 16.67
     lastTimeRef.current = timestamp
-    const dt = deltaTime / 16.67
-    
+
     const game = gameRef.current
     const { config, player, platforms } = game
     
