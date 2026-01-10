@@ -20,6 +20,15 @@ import {
   initAudio,
 } from '@/lib/game'
 
+// Flutter Bridge type definition
+declare global {
+  interface Window {
+    FlutterBridge?: {
+      postMessage: (message: string) => void
+    }
+  }
+}
+
 const STORAGE_KEY = 'cube-jump-highscore'
 
 function loadHighScore(): number {
@@ -225,13 +234,22 @@ export function useGame(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
       // Update falling
       if (player.isFalling) {
         player.fallProgress += deltaTime / 600
-        
+
         if (player.fallProgress >= 1) {
           game.state = 'gameover'
-          
+
           if (game.score > game.highScore) {
             game.highScore = game.score
             saveHighScore(game.score)
+          }
+
+          // Notify Flutter app about game end
+          if (window.FlutterBridge) {
+            window.FlutterBridge.postMessage(JSON.stringify({
+              event: 'gameEnd',
+              score: game.score,
+              highScore: game.highScore
+            }))
           }
         }
       }
